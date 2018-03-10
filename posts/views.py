@@ -57,3 +57,12 @@ def post_detail(request, pk):
         post.delete()
 
         return HttpResponse(status=204)
+
+
+def PostsIndexView(request):
+    queryset = Post.objects.all()
+    context = {
+        "posts": queryset,
+    }
+
+    return render(request, "PostsIndex.html", context)

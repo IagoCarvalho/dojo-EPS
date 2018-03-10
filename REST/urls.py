@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from users.views import UserViewSet, GroupViewSet
 from rest_framework import routers
+from django.contrib import admin
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -23,8 +24,10 @@ router.register(r'groups', GroupViewSet)
 
 
 urlpatterns = [
+    url(r'^admin/', admin.site.urls),
     url(r'^', include(router.urls)),
     #url(r'^', include('posts.urls')),
+    url(r'^blog/', include('posts.urls')),
     url(r'^api-auth/', include('rest_framework.urls',
         namespace='rest_framework')),
 ]
