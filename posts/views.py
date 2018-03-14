@@ -13,11 +13,14 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import permissions
 from django.http import Http404
-
+from django.contrib.auth.models import User
+from posts.serializers import UserSerializer
+from rest_framework import generics
+from posts.permissions import IsOwnerOrReadOnly
 # Create your views here.
 
 
-@permission_classes((permissions.AllowAny,))
+@permission_classes((permissions.IsAuthenticatedOrReadOnly,))
 class PostsList(APIView):
 
     def get(self, request, format=None):
@@ -37,8 +40,11 @@ class PostsList(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
-@permission_classes((permissions.AllowAny,))
+
+@permission_classes((permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly))
 class PostDetail(APIView):
 
     def get_object(self, pk):
@@ -75,3 +81,13 @@ def PostsIndexView(request):
     }
 
     return render(request, "PostsIndex.html", context)
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
